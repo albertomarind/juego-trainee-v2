@@ -1,0 +1,141 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+<link rel="import" href="/bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="/bower_components/polymer/lib/elements/dom-if.html">
+
+<link rel="import" href="/juego-trainee-figura.html">
+<link rel="import" href="/juego-trainee-modal.html">
+
+<dom-module id="juego-trainee">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        font-family: sans-serif;
+        --color-default: #F5F5F5;
+        --color-default-hover: #d2d2d2;
+        background-color: black;
+        padding: 2rem;
+        overflow: hidden;
+      }
+
+      .icono-gato,
+      .icono-perro {
+        position: absolute;
+        top: 0;
+        font-size: 3rem;
+      }
+
+      .icono-gato {
+        right: 0;
+        transform: rotate(30deg) scale(1.2);
+      }
+
+      .icono-perro {
+        left: 0;
+        transform: rotate(-30deg) scale(1.2);
+      }
+
+      .instrucciones {
+        color: white;
+      }
+
+      .instrucciones>*:not(h2) {
+        display: block;
+        margin-bottom: 1rem;
+      }
+
+      .instrucciones>.txt-titulo {
+        font-size: 1.6rem;
+        text-align: center;
+        margin: .1rem 0 1rem 0;
+      }
+
+      .instrucciones>.txt-instrucciones {
+        font-size: 1.4rem;
+      }
+
+      .instrucciones>.txt-descripcion {
+        font-size: 1.2rem;
+      }
+    </style>
+    <span class="icono-perro">🐶</span>
+    <span class="icono-gato">🐱</span>
+    <div class="instrucciones">
+      <h2 class="txt-titulo">El juego del gato</h2>
+      <label class="txt-instrucciones">Instrucciones:</label>
+      <span class="txt-descripcion"> Hay un gato escondido dentro de alguna de estas figuras, encuéntralo y gana,
+        ¡pero cuidado con los perros, ya que tambien están escondidos entre las figuras buscando al gato!</span>
+    </div>
+    <template is="dom-repeat" items="{{figuras}}" as="figura">
+      <juego-trainee-figura on-seleccion-ganadora="mostrarModal" es-ganador="{{figura.esGanador}}"
+        esta-seleccionada="{{figura.estaSeleccionada}}"></juego-trainee-figura>
+    </template>
+    <juego-trainee-modal es-ganador="{{datosModal.esGanador}}" titulo="{{datosModal.titulo}}"
+      mensaje="{{datosModal.mensaje}}" mostrar="{{datosModal.mostrar}}">
+    </juego-trainee-modal>
+
+  </template>
+
+  <script>
+    /**
+     * `juego-trainee`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class JuegoTrainee extends Polymer.Element {
+      static get is() {
+        return 'juego-trainee';
+      }
+      static get properties() {
+        return {
+          datosModal: {
+            type: Object,
+            value: {
+              titulo: '',
+              mensaje: '',
+              mostrar: false,
+              esGanador: false
+            }
+          },
+          figuras: {
+            type: Array,
+            value: []
+          }
+        };
+      }
+
+      ready() {
+        super.ready();
+        this.set('figuras', this.crearFiguras(10));
+      }
+
+      crearFiguras(cantidad) {
+        let numerosSinRepetir = [];
+        while (numerosSinRepetir.length < cantidad) {
+          let numeroAleatorio = Math.floor((Math.random() * cantidad) + 1);
+          if (!numerosSinRepetir.find((n) => n === numeroAleatorio)) {
+            numerosSinRepetir.push(numeroAleatorio);
+          }
+        }
+        return numerosSinRepetir.map((n) => ({
+          esGanador: n === 1 ? true : false,
+          estaSeleccionada: false
+        }));
+      }
+
+      mostrarModal(e) {
+        this.set('datosModal.titulo', '¡GANASTE!');
+        this.set('datosModal.mensaje', '¡Has encontrado al gato!');
+        this.set('datosModal.mostrar', true);
+        this.set('datosModal.esGanador', true);
+      }
+
+    }
+
+    window.customElements.define(JuegoTrainee.is, JuegoTrainee);
+  </script>
+</dom-module>

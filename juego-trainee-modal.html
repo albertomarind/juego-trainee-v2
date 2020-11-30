@@ -1,0 +1,141 @@
+<link rel="import" href="/bower_components/polymer/polymer-element.html">
+
+<dom-module id="juego-trainee-modal">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+
+
+      .modal {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(0, 0, 0, .7);
+      }
+
+      .modal-content {
+        background-color: white;
+        overflow: hidden;
+        border-radius: .5rem;
+      }
+
+      .modal-header,
+      .modal-body,
+      .modal-footer {
+        padding: 1rem;
+      }
+
+      .modal-header {
+        color: white;
+        font-size: 1.25rem;
+      }
+
+      .color-ganador {
+        background-color: #4CAF50;
+      }
+
+      .color-perdedor {
+        background-color: #D32F2F;
+      }
+
+      .modal-body {
+        font-size: 1.1rem;
+      }
+
+      .modal-footer {
+        text-align: right;
+      }
+
+      .btn {
+        padding: .5rem .8rem;
+        color: white;
+        cursor: pointer;
+        border: none;
+        border-radius: .25rem;
+        font-weight: 550;
+        font-size: 1rem;
+      }
+
+      .btn-default {
+        border: 1px solid #d6d6d6;
+        color: #646464;
+        font-weight: 550;
+        background-color: var(--color-default);
+      }
+
+      .btn-default:hover {
+        background-color: var(--color-default-hover);
+      }
+    </style>
+    <template is="dom-if" if="{{mostrar}}">
+      <div class="modal">
+        <div class="modal-content">
+          <div class$="modal-header {{colorHeader}}">
+            {{titulo}}
+          </div>
+          <div class="modal-body">
+            {{mensaje}}
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-default" on-click="cerrarModal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </template>
+  </template>
+  <script>
+    /**
+     * `juego-trainee-modal`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class JuegoTraineeModal extends Polymer.Element {
+      static get is() {
+        return 'juego-trainee-modal';
+      }
+      static get properties() {
+        return {
+          titulo: {
+            type: String,
+            value: ''
+          },
+          mensaje: {
+            type: String,
+            value: ''
+          },
+          mostrar: {
+            type: Boolean,
+            value: false
+          },
+          esGanador: {
+            type: Boolean,
+            value: false
+          },
+          colorHeader: {
+            type: String,
+            computed: '_obtenerColorHeader(esGanador)'
+          }
+        };
+      }
+      _obtenerColorHeader(esGanador) {
+        return esGanador ? 'color-ganador' : 'color-perdedor';
+      }
+      cerrarModal() {
+        this.set('mostrar', false);
+      }
+    }
+
+    window.customElements.define(JuegoTraineeModal.is, JuegoTraineeModal);
+  </script>
+</dom-module>
