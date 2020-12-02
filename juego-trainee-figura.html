@@ -7,6 +7,17 @@
       :host {
         display: inline-block;
         --medida: 8rem;
+        --figura-color-ganador: green;
+        --figura-color-perdedor: red;
+        --figura-color-sin-seleccion: gray;
+      }
+
+      :host([esta-seleccionada]) .figura {
+        background-color: var(--figura-color-perdedor);
+      }
+
+      :host([esta-seleccionada][es-ganador]) .figura {
+        background-color: var(--figura-color-ganador);
       }
 
       .figura {
@@ -17,17 +28,18 @@
         transition: ease .4s;
         margin: .75rem;
         position: relative;
+        background-color: var(--figura-color-sin-seleccion);
       }
-      .icono-animal{
+
+      .icono-animal {
         position: absolute;
         font-size: 4rem;
         top: 50%;
         left: 50%;
-        transform: translate(-50%,-50%);
+        transform: translate(-50%, -50%);
       }
     </style>
-    <div class="figura" on-click="seleccionarFigura" style$="background-color:[[colorFigura]]">
-
+    <div class="figura" on-click="seleccionarFigura">
       <template is="dom-if" if="{{estaSeleccionada}}">
         <template is="dom-if" if="{{esGanador}}">
           <span class="icono-animal">🐱</span>
@@ -36,19 +48,10 @@
           <span class="icono-animal">🐶</span>
         </template>
       </template>
-
     </div>
   </template>
 
   <script>
-    /**
-     * `juego-trainee-figura`
-     * 
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
     class JuegoTraineeFigura extends Polymer.Element {
       static get is() {
         return 'juego-trainee-figura';
@@ -57,34 +60,19 @@
         return {
           esGanador: {
             type: Boolean,
-            value: false
+            value: false,
+            reflectToAttribute: true
           },
           estaSeleccionada: {
             type: Boolean,
-            value: false
-          },
-          colorFigura: {
-            type: String,
-            computed: '_obtenerColorFigura(esGanador,estaSeleccionada)'
+            value: false,
+            reflectToAttribute: true
           }
         };
       }
-
-      _obtenerColorFigura(esGanador, estaSeleccionada) {
-        if (esGanador && estaSeleccionada) {
-          return '#4CAF50'; //Verde
-        } else if (!esGanador && estaSeleccionada) {
-          return '#D32F2F'; //Rojo
-        } else {
-          return '#616161'; //Gris
-        }
-      }
-
       seleccionarFigura(e) {
         this.set('estaSeleccionada', true);
-        if (this.get('esGanador')) {
-          this.dispatchEvent(new CustomEvent('seleccion-ganadora', null));
-        }
+        this.dispatchEvent(new CustomEvent('seleccion', { detail: { esGanador: this.get('esGanador') } }));
       }
     }
     window.customElements.define(JuegoTraineeFigura.is, JuegoTraineeFigura);

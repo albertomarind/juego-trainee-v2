@@ -4,11 +4,14 @@
   <template>
     <style>
       :host {
-        display: block;
+        display: inline-block;
+        --color-background-header: white;
+        --color-text-header: black;
+        --color-background-btn-close: #F5F5F5;
+        --color-background-btn-close-hover: #d2d2d2;
+        --color-text-btn-close: #646464;
       }
-
-
-
+      
       .modal {
         position: fixed;
         top: 0;
@@ -34,16 +37,9 @@
       }
 
       .modal-header {
-        color: white;
+        color: var(--color-text-header);
+        background-color: var(--color-background-header);
         font-size: 1.25rem;
-      }
-
-      .color-ganador {
-        background-color: #4CAF50;
-      }
-
-      .color-perdedor {
-        background-color: #D32F2F;
       }
 
       .modal-body {
@@ -56,7 +52,6 @@
 
       .btn {
         padding: .5rem .8rem;
-        color: white;
         cursor: pointer;
         border: none;
         border-radius: .25rem;
@@ -64,42 +59,34 @@
         font-size: 1rem;
       }
 
-      .btn-default {
-        border: 1px solid #d6d6d6;
-        color: #646464;
-        font-weight: 550;
-        background-color: var(--color-default);
+      .btn-close {
+        border: 1px solid var(--color-background-btn-close-hover);
+        color: var(--color-text-btn-close);
+        background-color: var(--color-background-btn-close);
       }
 
-      .btn-default:hover {
-        background-color: var(--color-default-hover);
+      .btn-close:hover {
+        background-color: var(--color-background-btn-close-hover);
       }
     </style>
     <template is="dom-if" if="{{mostrar}}">
       <div class="modal">
         <div class="modal-content">
-          <div class$="modal-header {{colorHeader}}">
+          <div class="modal-header">
             {{titulo}}
+            <slot></slot>
           </div>
           <div class="modal-body">
             {{mensaje}}
           </div>
           <div class="modal-footer">
-            <button class="btn btn-default" on-click="cerrarModal">Cerrar</button>
+            <button class="btn btn-close" on-click="cerrarModal">Cerrar</button>
           </div>
         </div>
       </div>
     </template>
   </template>
   <script>
-    /**
-     * `juego-trainee-modal`
-     * 
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
     class JuegoTraineeModal extends Polymer.Element {
       static get is() {
         return 'juego-trainee-modal';
@@ -117,25 +104,13 @@
           mostrar: {
             type: Boolean,
             value: false
-          },
-          esGanador: {
-            type: Boolean,
-            value: false
-          },
-          colorHeader: {
-            type: String,
-            computed: '_obtenerColorHeader(esGanador)'
           }
         };
-      }
-      _obtenerColorHeader(esGanador) {
-        return esGanador ? 'color-ganador' : 'color-perdedor';
       }
       cerrarModal() {
         this.set('mostrar', false);
       }
     }
-
     window.customElements.define(JuegoTraineeModal.is, JuegoTraineeModal);
   </script>
 </dom-module>

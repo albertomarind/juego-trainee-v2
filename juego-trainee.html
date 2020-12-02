@@ -1,9 +1,10 @@
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
 <link rel="import" href="/bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="/bower_components/polymer/lib/elements/dom-if.html">
-
+<link rel="import" href="/utils-styles.html">
 <link rel="import" href="/juego-trainee-figura.html">
 <link rel="import" href="/juego-trainee-modal.html">
+
 
 <dom-module id="juego-trainee">
   <template>
@@ -12,12 +13,34 @@
         display: block;
         position: relative;
         font-family: sans-serif;
-        --color-default: #F5F5F5;
-        --color-default-hover: #d2d2d2;
         background-color: black;
         padding: 2rem;
         overflow: hidden;
       }
+
+      juego-trainee-modal.ganador,
+      juego-trainee-modal.perdedor {
+        --color-text-header: white;
+      }
+
+      juego-trainee-modal.ganador {
+        --color-background-header: #4CAF50;
+      }
+
+      juego-trainee-modal.perdedor {
+        --color-background-header: #D32F2F;
+      }
+
+      juego-trainee-figura[esta-seleccionada] {
+        /* --figura-color-perdedor: var(--color-perdedor); */
+        --figura-color-perdedor: #D32F2F;
+      }
+
+      juego-trainee-figura[esta-seleccionada][es-ganador] {
+        /* --figura-color-ganador: var(--color-ganador); */
+        --figura-color-ganador: #4CAF50;
+      }
+
 
       .icono-gato,
       .icono-perro {
@@ -68,24 +91,16 @@
         ¡pero cuidado con los perros, ya que tambien están escondidos entre las figuras buscando al gato!</span>
     </div>
     <template is="dom-repeat" items="{{figuras}}" as="figura">
-      <juego-trainee-figura on-seleccion-ganadora="mostrarModal" es-ganador="{{figura.esGanador}}"
+      <juego-trainee-figura class="m-1" on-seleccion="obtenerSeleccion" es-ganador="{{figura.esGanador}}"
         esta-seleccionada="{{figura.estaSeleccionada}}"></juego-trainee-figura>
     </template>
-    <juego-trainee-modal es-ganador="{{datosModal.esGanador}}" titulo="{{datosModal.titulo}}"
-      mensaje="{{datosModal.mensaje}}" mostrar="{{datosModal.mostrar}}">
+    <juego-trainee-modal titulo="{{datosModal.titulo}}" mensaje="{{datosModal.mensaje}}"
+      mostrar="{{datosModal.mostrar}}">
     </juego-trainee-modal>
 
   </template>
 
   <script>
-    /**
-     * `juego-trainee`
-     * 
-     *
-     * @customElement
-     * @polymer
-     * @demo demo/index.html
-     */
     class JuegoTrainee extends Polymer.Element {
       static get is() {
         return 'juego-trainee';
@@ -98,12 +113,16 @@
               titulo: '',
               mensaje: '',
               mostrar: false,
-              esGanador: false
+              estatus: 'defecto'
             }
           },
           figuras: {
             type: Array,
             value: []
+          },
+          intentos: {
+            type: Number,
+            value: 3
           }
         };
       }
@@ -127,11 +146,27 @@
         }));
       }
 
-      mostrarModal(e) {
-        this.set('datosModal.titulo', '¡GANASTE!');
-        this.set('datosModal.mensaje', '¡Has encontrado al gato!');
+      obtenerSeleccion(e) {
+        if (e.detail.esGanador) {
+          this.mostrarModal('¡GANASTE!', '¡Has encontrado al gato!', 'ganador');
+        } else {
+          this.restarIntentos();
+          if (this.get('intentos') === 0) {
+            this.mostrarModal('PERDISTE...', 'Se han acabado tus intentos...', 'perdedor');
+          }
+        }
+      }
+
+      restarIntentos() {
+        let intentos = this.get('intentos');
+        this.set('intentos', --intentos);
+      }
+
+      mostrarModal(titulo, mensaje, estatus) {
+        this.set('datosModal.titulo', titulo);
+        this.set('datosModal.mensaje', mensaje);
         this.set('datosModal.mostrar', true);
-        this.set('datosModal.esGanador', true);
+        this.set('datosModal.estatus', estatus);
       }
 
     }
