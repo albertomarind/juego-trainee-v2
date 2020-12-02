@@ -94,7 +94,7 @@
       <juego-trainee-figura class="m-1" on-seleccion="obtenerSeleccion" es-ganador="{{figura.esGanador}}"
         esta-seleccionada="{{figura.estaSeleccionada}}"></juego-trainee-figura>
     </template>
-    <juego-trainee-modal titulo="{{datosModal.titulo}}" mensaje="{{datosModal.mensaje}}"
+    <juego-trainee-modal class$="{{datosModal.estatus}}" titulo="{{datosModal.titulo}}" mensaje="{{datosModal.mensaje}}"
       mostrar="{{datosModal.mostrar}}">
     </juego-trainee-modal>
 
