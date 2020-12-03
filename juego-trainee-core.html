@@ -6,6 +6,9 @@
 <dom-module id="juego-trainee-core">
   <template>
     <style include="utils-styles">
+      juego-trainee-figura{ 
+        --figura-color-sin-seleccion: var(--color-defecto);
+      }
       juego-trainee-figura[esta-seleccionada] {
         --figura-color-perdedor: var(--color-perdedor);
       }
@@ -13,6 +16,7 @@
       juego-trainee-figura[esta-seleccionada][es-ganador] {
         --figura-color-ganador: var(--color-ganador);
       }
+      
     </style>
     <div class="d-flex justify-content-center flex-wrap">
       <template is="dom-repeat" items="{{figuras}}" as="figura">
