@@ -7,11 +7,11 @@
   <template>
     <style include="utils-styles">
       juego-trainee-figura[esta-seleccionada] {
-        --figura-color-perdedor: #D32F2F;
+        --figura-color-perdedor: var(--color-perdedor);
       }
 
       juego-trainee-figura[esta-seleccionada][es-ganador] {
-        --figura-color-ganador: #4CAF50;
+        --figura-color-ganador: var(--color-ganador);
       }
     </style>
     <div class="d-flex justify-content-center flex-wrap">
@@ -20,7 +20,6 @@
           esta-seleccionada="{{figura.estaSeleccionada}}"></juego-trainee-figura>
       </template>
     </div>
-
   </template>
 
   <script>
