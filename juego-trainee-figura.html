@@ -26,7 +26,6 @@
         height: var(--medida);
         cursor: pointer;
         transition: ease .4s;
-        margin: .75rem;
         position: relative;
         background-color: var(--figura-color-sin-seleccion);
       }
@@ -39,7 +38,7 @@
         transform: translate(-50%, -50%);
       }
     </style>
-    <div class="figura" on-click="seleccionarFigura">
+    <div class="figura">
       <template is="dom-if" if="{{estaSeleccionada}}">
         <template is="dom-if" if="{{esGanador}}">
           <span class="icono-animal">🐱</span>
@@ -69,10 +68,6 @@
             reflectToAttribute: true
           }
         };
-      }
-      seleccionarFigura(e) {
-        this.set('estaSeleccionada', true);
-        this.dispatchEvent(new CustomEvent('seleccion', { detail: { esGanador: this.get('esGanador') } }));
       }
     }
     window.customElements.define(JuegoTraineeFigura.is, JuegoTraineeFigura);

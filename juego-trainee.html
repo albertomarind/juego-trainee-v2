@@ -1,14 +1,12 @@
 <link rel="import" href="/bower_components/polymer/polymer-element.html">
-<link rel="import" href="/bower_components/polymer/lib/elements/dom-repeat.html">
-<link rel="import" href="/bower_components/polymer/lib/elements/dom-if.html">
 <link rel="import" href="/utils-styles.html">
-<link rel="import" href="/juego-trainee-figura.html">
 <link rel="import" href="/juego-trainee-modal.html">
+<link rel="import" href="/juego-trainee-core.html">
 
 
 <dom-module id="juego-trainee">
   <template>
-    <style>
+    <style include="utils-styles">
       :host {
         display: block;
         position: relative;
@@ -30,17 +28,6 @@
       juego-trainee-modal.perdedor {
         --color-background-header: #D32F2F;
       }
-
-      juego-trainee-figura[esta-seleccionada] {
-        /* --figura-color-perdedor: var(--color-perdedor); */
-        --figura-color-perdedor: #D32F2F;
-      }
-
-      juego-trainee-figura[esta-seleccionada][es-ganador] {
-        /* --figura-color-ganador: var(--color-ganador); */
-        --figura-color-ganador: #4CAF50;
-      }
-
 
       .icono-gato,
       .icono-perro {
@@ -90,12 +77,12 @@
       <span class="txt-descripcion"> Hay un gato escondido dentro de alguna de estas figuras, encuéntralo y gana,
         ¡pero cuidado con los perros, ya que tambien están escondidos entre las figuras buscando al gato!</span>
     </div>
-    <template is="dom-repeat" items="{{figuras}}" as="figura">
-      <juego-trainee-figura class="m-1" on-seleccion="obtenerSeleccion" es-ganador="{{figura.esGanador}}"
-        esta-seleccionada="{{figura.estaSeleccionada}}"></juego-trainee-figura>
-    </template>
+    <juego-trainee-core id="core" cantidad="{{cantidad}}" on-ganador="mostrarModalGanador"
+      on-perdedor="mostrarModalPerdedor">
+    </juego-trainee-core>
     <juego-trainee-modal class$="{{datosModal.estatus}}" titulo="{{datosModal.titulo}}" mensaje="{{datosModal.mensaje}}"
       mostrar="{{datosModal.mostrar}}">
+      <button on-click="reiniciar">Reiniciar</button>
     </juego-trainee-modal>
 
   </template>
@@ -107,6 +94,10 @@
       }
       static get properties() {
         return {
+          cantidad: {
+            type: Number,
+            value: 5
+          },
           datosModal: {
             type: Object,
             value: {
@@ -115,51 +106,33 @@
               mostrar: false,
               estatus: 'defecto'
             }
-          },
-          figuras: {
-            type: Array,
-            value: []
-          },
-          intentos: {
-            type: Number,
-            value: 3
           }
         };
       }
 
       ready() {
         super.ready();
-        this.set('figuras', this.crearFiguras(10));
+        console.log(this.$.core);
       }
 
-      crearFiguras(cantidad) {
-        let numerosSinRepetir = [];
-        while (numerosSinRepetir.length < cantidad) {
-          let numeroAleatorio = Math.floor((Math.random() * cantidad) + 1);
-          if (!numerosSinRepetir.find((n) => n === numeroAleatorio)) {
-            numerosSinRepetir.push(numeroAleatorio);
-          }
-        }
-        return numerosSinRepetir.map((n) => ({
-          esGanador: n === 1 ? true : false,
-          estaSeleccionada: false
-        }));
+      reiniciar() {
+        this.set('cantidad', this.get('cantidad'));
+        this.$.core.iniciar();
+        this.cerrarModal();
       }
 
-      obtenerSeleccion(e) {
-        if (e.detail.esGanador) {
-          this.mostrarModal('¡GANASTE!', '¡Has encontrado al gato!', 'ganador');
-        } else {
-          this.restarIntentos();
-          if (this.get('intentos') === 0) {
-            this.mostrarModal('PERDISTE...', 'Se han acabado tus intentos...', 'perdedor');
-          }
-        }
+      mostrarModalGanador() {
+        this.mostrarModal('¡GANASTE!', '¡Has encontrado al gato!', 'ganador');
+      }
+      mostrarModalPerdedor() {
+        this.mostrarModal('PERDISTE...', 'Se han acabado tus intentos...', 'perdedor');
       }
 
-      restarIntentos() {
-        let intentos = this.get('intentos');
-        this.set('intentos', --intentos);
+      cerrarModal() {
+        this.set('datosModal.titulo', '');
+        this.set('datosModal.mensaje', '');
+        this.set('datosModal.mostrar', false);
+        this.set('datosModal.estatus', 'defecto');
       }
 
       mostrarModal(titulo, mensaje, estatus) {
@@ -168,7 +141,6 @@
         this.set('datosModal.mostrar', true);
         this.set('datosModal.estatus', estatus);
       }
-
     }
 
     window.customElements.define(JuegoTrainee.is, JuegoTrainee);
