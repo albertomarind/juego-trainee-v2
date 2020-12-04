@@ -1,0 +1,110 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="juego-trainee-figura.html">
+<link rel="import" href="utils-styles.html">
+
+<dom-module id="juego-trainee-core">
+  <template>
+    <style include="utils-styles">
+      juego-trainee-figura{ 
+        --figura-color-sin-seleccion: var(--color-defecto);
+      }
+      juego-trainee-figura[esta-seleccionada] {
+        --figura-color-perdedor: var(--color-perdedor);
+      }
+
+      juego-trainee-figura[esta-seleccionada][es-ganador] {
+        --figura-color-ganador: var(--color-ganador);
+      }
+      
+    </style>
+    <div class="d-flex justify-content-center flex-wrap">
+      <template is="dom-repeat" items="{{figuras}}" as="figura">
+        <juego-trainee-figura class="m-1" es-ganador="{{figura.esGanador}}" on-click="seleccionarFigura"
+          esta-seleccionada="{{figura.estaSeleccionada}}"></juego-trainee-figura>
+      </template>
+    </div>
+  </template>
+
+  <script>
+    class JuegoTraineeCore extends Polymer.Element {
+
+      static get is() {
+        return 'juego-trainee-core';
+      }
+
+      static get properties() {
+        return {
+          figuras: {
+            type: Array,
+            value: []
+          },
+          cantidad: {
+            type: Number,
+            value: 5,
+            reflectToAttribute: true
+          },
+          intentos: Number
+        };
+      }
+
+      ready() {
+        super.ready();
+        this.iniciar();
+      }
+
+      iniciar() {
+        this.calcularIntentos(this.get('cantidad'));
+        this.set('figuras', this.crearFiguras(this.get('cantidad')));
+      }
+
+      calcularIntentos(cantidadFiguras) {
+        this.set('intentos', cantidadFiguras - 1);
+      }
+
+      crearFiguras(cantidad) {
+        let numerosSinRepetir = [];
+        while (numerosSinRepetir.length < cantidad) {
+          let numeroAleatorio = Math.floor((Math.random() * cantidad) + 1);
+          if (!numerosSinRepetir.find((n) => n === numeroAleatorio)) {
+            numerosSinRepetir.push(numeroAleatorio);
+          }
+        }
+        return numerosSinRepetir.map((n) => ({
+          esGanador: n === 1 ? true : false,
+          estaSeleccionada: false
+        }));
+      }
+
+      seleccionarFigura(evento) {
+        evento.model.set('figura.estaSeleccionada', true);
+        if (evento.model.figura.esGanador) {
+          this.generarEvento('ganador');
+        } else {
+          this.restarIntentos();
+          if (this.get('intentos') === 0) {
+            this.generarEvento('perdedor');
+          }
+        }
+      }
+
+      generarEvento(nombreEvento) {
+        let evento = new CustomEvent(nombreEvento);
+        this.dispatchEvent(evento);
+      }
+
+      restarIntentos() {
+        let intentos = this.get('intentos');
+        this.set('intentos', --intentos);
+      }
+
+      attributeChangedCallback(name, oldValue, newValue) {
+        this.iniciar();
+      }
+      static get observedAttributes() {
+        return ['cantidad'];
+      }
+    }
+    window.customElements.define(JuegoTraineeCore.is, JuegoTraineeCore);
+  </script>
+</dom-module>

@@ -1,0 +1,147 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="utils-styles.html">
+<link rel="import" href="juego-trainee-modal.html">
+<link rel="import" href="juego-trainee-core.html">
+
+
+<dom-module id="juego-trainee">
+  <template>
+    <style include="utils-styles">
+      :host {
+        display: block;
+        position: relative;
+        font-family: sans-serif;
+        background-color: black;
+        padding: 2rem;
+        overflow: hidden;
+      }
+
+      juego-trainee-modal.ganador,
+      juego-trainee-modal.perdedor {
+        --color-text-header: white;
+      }
+
+      juego-trainee-modal.ganador {
+        --color-background-header: var(--color-ganador);
+      }
+
+      juego-trainee-modal.perdedor {
+        --color-background-header: var(--color-perdedor);
+      }
+
+      .icono-gato,
+      .icono-perro {
+        position: absolute;
+        top: 0;
+        font-size: 3rem;
+      }
+
+      .icono-gato {
+        right: 0;
+        transform: rotate(30deg) scale(1.2);
+      }
+
+      .icono-perro {
+        left: 0;
+        transform: rotate(-30deg) scale(1.2);
+      }
+
+      .instrucciones {
+        color: white;
+      }
+
+      .instrucciones>*:not(h2) {
+        display: block;
+        margin-bottom: 1rem;
+      }
+
+      .instrucciones>.txt-titulo {
+        font-size: 1.6rem;
+        text-align: center;
+        margin: .1rem 0 1rem 0;
+      }
+
+      .instrucciones>.txt-instrucciones {
+        font-size: 1.4rem;
+      }
+
+      .instrucciones>.txt-descripcion {
+        font-size: 1.2rem;
+      }
+    </style>
+    <span class="icono-perro">🐶</span>
+    <span class="icono-gato">🐱</span>
+    <div class="instrucciones">
+      <h2 class="txt-titulo">El juego del gato</h2>
+      <label class="txt-instrucciones">Instrucciones:</label>
+      <span class="txt-descripcion"> Hay un gato escondido dentro de alguna de estas figuras, encuéntralo y gana,
+        ¡pero cuidado con los perros, ya que tambien están escondidos entre las figuras buscando al gato!</span>
+    </div>
+    <juego-trainee-core id="core" cantidad="{{cantidad}}" on-ganador="mostrarModalGanador"
+      on-perdedor="mostrarModalPerdedor">
+    </juego-trainee-core>
+    <juego-trainee-modal class$="{{datosModal.estatus}}" titulo="{{datosModal.titulo}}" mensaje="{{datosModal.mensaje}}"
+      mostrar="{{datosModal.mostrar}}">
+      <button on-click="reiniciar">Reiniciar</button>
+    </juego-trainee-modal>
+
+  </template>
+
+  <script>
+    class JuegoTrainee extends Polymer.Element {
+      static get is() {
+        return 'juego-trainee';
+      }
+      static get properties() {
+        return {
+          cantidad: {
+            type: Number,
+            value: 5
+          },
+          datosModal: {
+            type: Object,
+            value: {
+              titulo: '',
+              mensaje: '',
+              mostrar: false,
+              estatus: 'defecto'
+            }
+          }
+        };
+      }
+
+      ready() {
+        super.ready();
+      }
+
+      reiniciar() {
+        this.set('cantidad', this.get('cantidad'));
+        this.$.core.iniciar();
+        this.cerrarModal();
+      }
+
+      mostrarModalGanador() {
+        this.mostrarModal('¡GANASTE!', '¡Has encontrado al gato!', 'ganador');
+      }
+      mostrarModalPerdedor() {
+        this.mostrarModal('PERDISTE...', 'Se han acabado tus intentos...', 'perdedor');
+      }
+
+      cerrarModal() {
+        this.set('datosModal.titulo', '');
+        this.set('datosModal.mensaje', '');
+        this.set('datosModal.mostrar', false);
+        this.set('datosModal.estatus', 'defecto');
+      }
+
+      mostrarModal(titulo, mensaje, estatus) {
+        this.set('datosModal.titulo', titulo);
+        this.set('datosModal.mensaje', mensaje);
+        this.set('datosModal.mostrar', true);
+        this.set('datosModal.estatus', estatus);
+      }
+    }
+
+    window.customElements.define(JuegoTrainee.is, JuegoTrainee);
+  </script>
+</dom-module>
