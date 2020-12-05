@@ -6,9 +6,10 @@
 <dom-module id="juego-trainee-core">
   <template>
     <style include="utils-styles">
-      juego-trainee-figura{ 
+      juego-trainee-figura {
         --figura-color-sin-seleccion: var(--color-defecto);
       }
+
       juego-trainee-figura[esta-seleccionada] {
         --figura-color-perdedor: var(--color-perdedor);
       }
@@ -16,7 +17,6 @@
       juego-trainee-figura[esta-seleccionada][es-ganador] {
         --figura-color-ganador: var(--color-ganador);
       }
-      
     </style>
     <div class="d-flex justify-content-center flex-wrap">
       <template is="dom-repeat" items="{{figuras}}" as="figura">
@@ -54,26 +54,27 @@
       }
 
       iniciar() {
-        this.calcularIntentos(this.get('cantidad'));
-        this.set('figuras', this.crearFiguras(this.get('cantidad')));
+        this.calcularIntentos();
+        this.set('figuras', this.crearFiguras());
       }
 
-      calcularIntentos(cantidadFiguras) {
-        this.set('intentos', cantidadFiguras - 1);
+      calcularIntentos() {
+        this.set('intentos', this.cantidad - 1);
       }
 
-      crearFiguras(cantidad) {
+      crearFiguras() {
+        const cantidad = this.cantidad;
         let numerosSinRepetir = [];
         while (numerosSinRepetir.length < cantidad) {
           let numeroAleatorio = Math.floor((Math.random() * cantidad) + 1);
-          if (!numerosSinRepetir.find((n) => n === numeroAleatorio)) {
-            numerosSinRepetir.push(numeroAleatorio);
+          if (!numerosSinRepetir.find(numero => numero === numeroAleatorio)) {
+            numerosSinRepetir.push({
+              esGanador: numeroAleatorio === 1,
+              estaSeleccionada: false
+            });
           }
         }
-        return numerosSinRepetir.map((n) => ({
-          esGanador: n === 1 ? true : false,
-          estaSeleccionada: false
-        }));
+        return numerosSinRepetir;
       }
 
       seleccionarFigura(evento) {
