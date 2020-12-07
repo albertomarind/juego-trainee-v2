@@ -44,17 +44,20 @@
         background-color: var(--paper-indigo-400);
       }
 
-      juego-trainee-modal.ganador,
-      juego-trainee-modal.perdedor {
-        --color-text-header: white;
+      paper-dialog.ganador h2,
+      paper-dialog.perdedor h2 {
+        margin: 0;
+        padding: .5rem;
+        color: white;
+        text-align: center;
       }
 
-      juego-trainee-modal.ganador {
-        --color-background-header: var(--color-ganador);
+      paper-dialog.ganador h2 {
+        background-color: var(--color-ganador);
       }
 
-      juego-trainee-modal.perdedor {
-        --color-background-header: var(--color-perdedor);
+      paper-dialog.perdedor h2 {
+        background-color: var(--color-perdedor);
       }
 
       .icono-gato,
@@ -97,30 +100,37 @@
         font-size: 1.2rem;
       }
     </style>
-    <paper-dialog id="modal" modal>
+    <paper-dialog id="modalInicio" modal>
       <paper-input always-float-label label="Nombre: " id="nombre"></paper-input>
       <paper-input always-float-label label="Cantidad de figuras: " id="cantidadFiguras" type="number"></paper-input>
       <div class="buttons">
         <paper-button dialog-confirm autofocus on-click="obtenerValoresDialog" class="indigo">Aceptar</paper-button>
       </div>
     </paper-dialog>
-    <span class="icono-perro">🐶</span>
-    <span class="icono-gato">🐱</span>
-    <div class="instrucciones">
-      <h1 class="txt-titulo">El juego del gato</h1>
-      <h2 class="txt-usuario">Usuario: {{nombreUsuario}}</h2>
-      <label class="txt-instrucciones">Instrucciones:</label>
-      <span class="txt-descripcion"> Hay un gato escondido dentro de alguna de estas figuras, encuéntralo y gana,
-        ¡pero cuidado con los perros, ya que tambien están escondidos entre las figuras buscando al gato!</span>
-    </div>
-    <juego-trainee-core id="core" cantidad="{{cantidadFiguras}}" on-ganador="mostrarModalGanador"
-      on-perdedor="mostrarModalPerdedor">
-    </juego-trainee-core>
+    <template is="dom-if" if="[[mostrarJuego]]">
 
-    <juego-trainee-modal class$="{{datosModal.estatus}}" titulo="{{datosModal.titulo}}" mensaje="{{datosModal.mensaje}}"
-      mostrar="{{datosModal.mostrar}}">
-      <button on-click="reiniciar">Reiniciar</button>
-    </juego-trainee-modal>
+      <span class="icono-perro">🐶</span>
+      <span class="icono-gato">🐱</span>
+      <div class="instrucciones">
+        <h1 class="txt-titulo">El juego del gato</h1>
+        <h2 class="txt-usuario">Usuario: {{nombreUsuario}}</h2>
+        <label class="txt-instrucciones">Instrucciones:</label>
+        <span class="txt-descripcion"> Hay un gato escondido dentro de alguna de estas figuras, encuéntralo y gana,
+          ¡pero cuidado con los perros, ya que tambien están escondidos entre las figuras buscando al gato!</span>
+      </div>
+
+      <juego-trainee-core id="core" cantidad="{{cantidadFiguras}}" on-ganador="mostrarModalGanador"
+        on-perdedor="mostrarModalPerdedor">
+      </juego-trainee-core>
+
+      <paper-dialog id="modalReinicio" modal class$="{{datosModal.estatus}}">
+        <h2> {{datosModal.titulo}}</h2>
+        <span class="d-block"> {{datosModal.mensaje}}</span>
+        <div class="buttons">
+          <paper-button dialog-confirm autofocus on-click="reiniciar">Reiniciar</paper-button>
+        </div>
+      </paper-dialog>
+    </template>
 
   </template>
 
@@ -140,19 +150,21 @@
             value: {
               titulo: '',
               mensaje: '',
-              mostrar: false,
               estatus: 'defecto'
             }
           },
           nombreUsuario: {
-            type: String,
-            value: ''
+            type: String
           },
+          mostrarJuego: {
+            type: Boolean,
+            value: false
+          }
         };
       }
 
       abrirPaperDialog() {
-        this.$.modal.open();
+        this.$.modalInicio.open();
       }
 
       ready() {
@@ -160,15 +172,15 @@
         this.abrirPaperDialog();
       }
 
-
       obtenerValoresDialog() {
         this.set('nombreUsuario', this.$.nombre.value);
         this.set('cantidadFiguras', parseInt(this.$.cantidadFiguras.value));
+        this.set('mostrarJuego', true);
       }
 
       reiniciar() {
         this.set('cantidadFiguras', this.cantidadFiguras);
-        this.$.core.iniciar();
+        this.shadowRoot.querySelector('#core').iniciar();
         this.cerrarModal();
       }
 
@@ -179,18 +191,11 @@
         this.mostrarModal('PERDISTE...', 'Se han acabado tus intentos...', 'perdedor');
       }
 
-      cerrarModal() {
-        this.set('datosModal.titulo', '');
-        this.set('datosModal.mensaje', '');
-        this.set('datosModal.mostrar', false);
-        this.set('datosModal.estatus', 'defecto');
-      }
-
       mostrarModal(titulo, mensaje, estatus) {
         this.set('datosModal.titulo', titulo);
         this.set('datosModal.mensaje', mensaje);
-        this.set('datosModal.mostrar', true);
         this.set('datosModal.estatus', estatus);
+        this.shadowRoot.querySelector('#modalReinicio').open();
       }
     }
 
