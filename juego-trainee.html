@@ -1,6 +1,8 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-input/paper-input.html">
 
 <link rel="import" href="utils-styles.html">
 <link rel="import" href="juego-trainee-modal.html">
@@ -14,9 +16,7 @@
         display: block;
         position: relative;
         font-family: sans-serif;
-        background-color: white;
-        
-
+        background-color: black;
         padding: 2rem;
         overflow: hidden;
       }
@@ -26,15 +26,6 @@
         font-weight: normal;
         font-size: 14px;
         -webkit-font-smoothing: antialiased;
-      }
-
-      paper-button.pink {
-        color: var(--paper-pink-a200);
-        --paper-button-ink-color: var(--paper-pink-a200);
-      }
-
-      paper-button.pink:hover {
-        background-color: var(--paper-pink-100);
       }
 
       paper-button.indigo {
@@ -52,22 +43,6 @@
       paper-button.indigo:hover {
         background-color: var(--paper-indigo-400);
       }
-
-      paper-button.green {
-        background-color: var(--paper-green-500);
-        color: white;
-      }
-
-      paper-button.green[active] {
-        background-color: var(--paper-red-500);
-      }
-
-      paper-button.disabled {
-        color: white;
-      }
-
-
-
 
       juego-trainee-modal.ganador,
       juego-trainee-modal.perdedor {
@@ -103,7 +78,7 @@
         color: white;
       }
 
-      .instrucciones>*:not(h2) {
+      .instrucciones>*:not(h1) {
         display: block;
         margin-bottom: 1rem;
       }
@@ -122,32 +97,26 @@
         font-size: 1.2rem;
       }
     </style>
-    <paper-button class="pink">link</paper-button>
-    <paper-button raised class="indigo">raised</paper-button>
-    <paper-button toggles raised class="green">toggles</paper-button>
-    <paper-button disabled class="disabled">disabled</paper-button>
-    <paper-button raised on-click="abrir">modal dialog</paper-button>
-
     <paper-dialog id="modal" modal>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-        magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-        consequat.</p>
+      <paper-input always-float-label label="Nombre: " id="nombre"></paper-input>
+      <paper-input always-float-label label="Cantidad de figuras: " id="cantidadFiguras" type="number"></paper-input>
       <div class="buttons">
-        <paper-button dialog-confirm autofocus>Tap me to close</paper-button>
+        <paper-button dialog-confirm autofocus on-click="obtenerValoresDialog" class="indigo">Aceptar</paper-button>
       </div>
     </paper-dialog>
-
     <span class="icono-perro">🐶</span>
     <span class="icono-gato">🐱</span>
     <div class="instrucciones">
-      <h2 class="txt-titulo">El juego del gato</h2>
+      <h1 class="txt-titulo">El juego del gato</h1>
+      <h2 class="txt-usuario">Usuario: {{nombreUsuario}}</h2>
       <label class="txt-instrucciones">Instrucciones:</label>
       <span class="txt-descripcion"> Hay un gato escondido dentro de alguna de estas figuras, encuéntralo y gana,
         ¡pero cuidado con los perros, ya que tambien están escondidos entre las figuras buscando al gato!</span>
     </div>
-    <juego-trainee-core id="core" cantidad="{{cantidad}}" on-ganador="mostrarModalGanador"
+    <juego-trainee-core id="core" cantidad="{{cantidadFiguras}}" on-ganador="mostrarModalGanador"
       on-perdedor="mostrarModalPerdedor">
     </juego-trainee-core>
+
     <juego-trainee-modal class$="{{datosModal.estatus}}" titulo="{{datosModal.titulo}}" mensaje="{{datosModal.mensaje}}"
       mostrar="{{datosModal.mostrar}}">
       <button on-click="reiniciar">Reiniciar</button>
@@ -162,7 +131,7 @@
       }
       static get properties() {
         return {
-          cantidad: {
+          cantidadFiguras: {
             type: Number,
             value: 5
           },
@@ -174,20 +143,31 @@
               mostrar: false,
               estatus: 'defecto'
             }
-          }
+          },
+          nombreUsuario: {
+            type: String,
+            value: ''
+          },
         };
       }
 
-      abrir(){
+      abrirPaperDialog() {
         this.$.modal.open();
       }
 
       ready() {
         super.ready();
+        this.abrirPaperDialog();
+      }
+
+
+      obtenerValoresDialog() {
+        this.set('nombreUsuario', this.$.nombre.value);
+        this.set('cantidadFiguras', parseInt(this.$.cantidadFiguras.value));
       }
 
       reiniciar() {
-        this.set('cantidad', this.get('cantidad'));
+        this.set('cantidadFiguras', this.cantidadFiguras);
         this.$.core.iniciar();
         this.cerrarModal();
       }
