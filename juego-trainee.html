@@ -2,10 +2,10 @@
 <link rel="import" href="../polymer/lib/elements/dom-if.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
 <link rel="import" href="../paper-input/paper-input.html">
 
 <link rel="import" href="utils-styles.html">
-<link rel="import" href="juego-trainee-modal.html">
 <link rel="import" href="juego-trainee-core.html">
 
 
@@ -35,9 +35,7 @@
         --paper-button-raised-keyboard-focus: {
           background-color: var(--paper-pink-a200) !important;
           color: white !important;
-        }
-
-        ;
+        };
       }
 
       paper-button.indigo:hover {
@@ -58,6 +56,13 @@
 
       paper-dialog.perdedor h2 {
         background-color: var(--color-perdedor);
+      }
+
+      paper-slider {
+        --paper-slider-input: {
+          display: inline-block;
+          width: 100px;
+        };
       }
 
       .icono-gato,
@@ -101,10 +106,11 @@
       }
     </style>
     <paper-dialog id="modalInicio" modal>
-      <paper-input always-float-label label="Nombre: " id="nombre"></paper-input>
-      <paper-input always-float-label label="Cantidad de figuras: " id="cantidadFiguras" type="number"></paper-input>
+      <paper-input required auto-validate error-message="Ingresa el nombre por favor" always-float-label
+        label="Nombre: " id="nombre"></paper-input>
+      <paper-slider id="cantidadFiguras" min="1" max="100" value="5" editable></paper-slider>
       <div class="buttons">
-        <paper-button dialog-confirm autofocus on-click="obtenerValoresDialog" class="indigo">Aceptar</paper-button>
+        <paper-button on-click="validarDatosUsuario" class="indigo">Aceptar</paper-button>
       </div>
     </paper-dialog>
     <template is="dom-if" if="[[mostrarJuego]]">
@@ -114,7 +120,7 @@
       <div class="instrucciones">
         <h1 class="txt-titulo">El juego del gato</h1>
         <h2 class="txt-usuario">Usuario: {{nombreUsuario}}</h2>
-        <label class="txt-instrucciones">Instrucciones:</label>
+        <label class="txt-instrucciones">Instrucciones: </label>
         <span class="txt-descripcion"> Hay un gato escondido dentro de alguna de estas figuras, encuéntralo y gana,
           ¡pero cuidado con los perros, ya que tambien están escondidos entre las figuras buscando al gato!</span>
       </div>
@@ -172,10 +178,13 @@
         this.abrirDialog();
       }
 
-      obtenerValoresDialog() {
-        this.set('nombreUsuario', this.$.nombre.value);
-        this.set('cantidadFiguras', parseInt(this.$.cantidadFiguras.value));
-        this.set('mostrarJuego', true);
+      validarDatosUsuario() {
+        if (this.shadowRoot.getElementById('nombre').validate()) {
+          this.set('nombreUsuario', this.$.nombre.value);
+          this.set('cantidadFiguras', parseInt(this.$.cantidadFiguras.value));
+          this.set('mostrarJuego', true)
+          this.$.modalInicio.close();
+        }
       }
 
       reiniciar() {
