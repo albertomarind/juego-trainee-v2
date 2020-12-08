@@ -1,27 +1,44 @@
 <link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="juego-trainee-figura.html">
 <link rel="import" href="utils-styles.html">
 
 <dom-module id="juego-trainee-core">
   <template>
     <style include="utils-styles">
-      juego-trainee-figura {
-        --figura-color-sin-seleccion: var(--color-defecto);
+      paper-button {
+        background-color: var(--color-defecto);
+        width: 8rem;
+        height: 8rem;
       }
 
-      juego-trainee-figura[esta-seleccionada] {
-        --figura-color-perdedor: var(--color-perdedor);
+      paper-button.esta-seleccionada {
+        background-color: var(--color-perdedor);
       }
 
-      juego-trainee-figura[esta-seleccionada][es-ganador] {
-        --figura-color-ganador: var(--color-ganador);
+      paper-button.esta-seleccionada.es-ganador {
+        background-color: var(--color-ganador);
       }
-    </style>
+
+      paper-button span {
+        font-size: 4rem;
+      }
+    </style> 
     <div class="d-flex justify-content-center flex-wrap">
       <template is="dom-repeat" items="{{figuras}}" as="figura">
-        <juego-trainee-figura class="m-1" es-ganador="{{figura.esGanador}}" on-click="seleccionarFigura"
-          esta-seleccionada="{{figura.estaSeleccionada}}"></juego-trainee-figura>
+        <paper-button class$="m-1 {{_esGanador(figura.esGanador)}} {{_estaSeleccionada(figura.estaSeleccionada)}}"
+          on-click="seleccionarFigura">
+          <template is="dom-if" if="[[figura.estaSeleccionada]]">
+            <template is="dom-if" if="[[figura.esGanador]]">
+              <span>🐱</span>
+            </template>
+            <template is="dom-if" if="[[!figura.esGanador]]">
+              <span>🐶</span>
+            </template>
+          </template>
+        </paper-button>
       </template>
     </div>
   </template>
@@ -53,6 +70,14 @@
         this.iniciar();
       }
 
+      _esGanador(esGanador) {
+        return esGanador ? 'es-ganador' : '';
+      }
+
+      _estaSeleccionada(estaSeleccionada) {
+        return estaSeleccionada ? 'esta-seleccionada' : '';
+      }
+
       iniciar() {
         this.calcularIntentos();
         this.set('figuras', this.crearFiguras());
@@ -68,13 +93,13 @@
         while (numerosSinRepetir.length < cantidad) {
           let numeroAleatorio = Math.floor((Math.random() * cantidad) + 1);
           if (!numerosSinRepetir.find(numero => numero === numeroAleatorio)) {
-            numerosSinRepetir.push({
-              esGanador: numeroAleatorio === 1,
-              estaSeleccionada: false
-            });
+            numerosSinRepetir.push(numeroAleatorio);
           }
         }
-        return numerosSinRepetir;
+        return numerosSinRepetir.map((numero) => ({
+          esGanador: numero === 1,
+          estaSeleccionada: false
+        }));
       }
 
       seleccionarFigura(evento) {
@@ -100,7 +125,9 @@
       }
 
       attributeChangedCallback(name, oldValue, newValue) {
-        this.iniciar();
+        if (oldValue !== null) {
+          this.iniciar();
+        }
       }
       static get observedAttributes() {
         return ['cantidad'];
