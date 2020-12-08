@@ -33,9 +33,11 @@
         color: white;
 
         --paper-button-raised-keyboard-focus: {
-          background-color: var(--paper-pink-a200) !important;
-          color: white !important;
-        };
+          background-color: var(--paper-pink-a200);
+          color: white;
+        }
+
+        ;
       }
 
       paper-button.indigo:hover {
@@ -59,10 +61,14 @@
       }
 
       paper-slider {
+        margin-top: 0;
+
         --paper-slider-input: {
           display: inline-block;
           width: 100px;
-        };
+        }
+
+        ;
       }
 
       .icono-gato,
@@ -104,10 +110,18 @@
       .instrucciones>.txt-descripcion {
         font-size: 1.2rem;
       }
+
+      .lbl-figuras {
+        margin-top: 25px;
+        display: inline-block;
+        font-size: .8rem;
+        font-weight: 300;
+      }
     </style>
     <paper-dialog id="modalInicio" modal>
       <paper-input required auto-validate error-message="Ingresa el nombre por favor" always-float-label
         label="Nombre: " id="nombre"></paper-input>
+      <label class="lbl-figuras">Cantidad de figuras:</label>
       <paper-slider id="cantidadFiguras" min="1" max="100" value="5" editable></paper-slider>
       <div class="buttons">
         <paper-button on-click="validarDatosUsuario" class="indigo">Aceptar</paper-button>
@@ -133,7 +147,7 @@
         <h2> {{datosModal.titulo}}</h2>
         <span class="d-block"> {{datosModal.mensaje}}</span>
         <div class="buttons">
-          <paper-button dialog-confirm autofocus on-click="reiniciar">Reiniciar</paper-button>
+          <paper-button dialog-confirm on-click="reiniciar">Reiniciar</paper-button>
         </div>
       </paper-dialog>
     </template>
@@ -190,7 +204,6 @@
       reiniciar() {
         this.set('cantidadFiguras', this.cantidadFiguras);
         this.shadowRoot.querySelector('#core').iniciar();
-        this.cerrarModal();
       }
 
       mostrarModalGanador() {
